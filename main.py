@@ -51,6 +51,19 @@ def get_product_information(url):
         
         product_name=product_div.find("div",class_="ProductInformation").find("h1",class_="Text-ds Text-ds--body-1 Text-ds--left").find("span",class_="Text-ds Text-ds--title-5 Text-ds--left").get_text(strip=True)
         information_dict["Product Name"]=product_name
+
+        description=product_div.find("div",class_="ProductSummary").find("p",class_="Text-ds Text-ds--subtitle-1 Text-ds--left").get_text(strip=True)
+        information_dict["Product Description"]=description
+
+        price=product_div.find("div",class_="ProductPricing").find("span",class_="Text-ds Text-ds--title-6 Text-ds--left Text-ds--black").get_text(strip=True)
+        information_dict["Product Price"]=price
+
+        ratings=product_div.find("div",class_="ProductInformation").find("div",class_="ReviewStars").find("div",class_="ReviewStars__Content").find("span",class_="Text-ds Text-ds--body-3 Text-ds--left").get_text(strip=True)
+        information_dict["Overall Ratings"]=ratings
+        
+        review_count=product_div.find("div",class_="ProductInformation").find("div",class_="ReviewStars").find("a",class_="Link_Huge Link_Huge--compact").find("span",class_="Text-ds Text-ds--body-3 Text-ds--left").get_text(strip=True)
+        information_dict["Total no of Reviews/Feedback"]=review_count
+
     else:
         print(f'Failed to retrieve the page. Status code: {response.status_code}')
 
