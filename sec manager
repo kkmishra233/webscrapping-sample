@@ -1,0 +1,30 @@
+import boto3
+import json
+from django.conf import settings
+
+class SecretManager:
+    _secrets = None  # Cache to load secrets only once
+
+    @classmethod
+    def load_secrets(cls, secret_name, region_name="us-east-1"):
+        """Load and override all SECRET_ settings from AWS Secrets Manager."""
+        if cls._secrets is None:
+            cls._secrets = cls._fetch_secrets(secret_name, region_name)
+            cls._override_secret_settings(cls._secrets)
+
+    @staticmethod
+    def _fetch_secrets(secret_name, region_name):
+        """Fetch secrets from AWS Secrets Manager."""
+        client = boto3.client("secretsmanager", region_name=region_name)
+        response = client.get_secret_value(SecretId=secret_name)
+
+        if "SecretString" in response:
+            return json.loads(response["SecretString"])
+        return {}
+
+    @classmethod
+    def _override_secret_settings(cls, secrets):
+        """Override only SECRET_ settings in Django settings."""
+        for key in dir(settings):  # Iterate through all settings
+            if key.startswith("SECRET_") and key in secrets:
+                setattr(settings, key, secrets[key])
